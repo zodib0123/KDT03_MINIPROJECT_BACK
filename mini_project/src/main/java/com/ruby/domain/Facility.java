@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Facility {
 	@Id
 	@Column(nullable = false)
@@ -31,7 +33,9 @@ public class Facility {
 	private String city;
 	private String gugun;
 	private String tel;
-	private String date;
+	private String createDate;
+	private Character erdsgn;
+	private String updated;
 	
 	@JsonProperty("fulladdr")
 	public String getFullAddr() {

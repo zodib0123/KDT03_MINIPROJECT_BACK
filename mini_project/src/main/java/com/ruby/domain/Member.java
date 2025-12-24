@@ -1,9 +1,10 @@
 package com.ruby.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,13 +16,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class Member {
 	@Id
-	@Column(nullable = false)
-	private String mId;
-	@Column(nullable = false)
+	@NotBlank(message = "ID is required")
+	private String mid;
+	@NotBlank(message = "Password is required")
 	private String pwd;
-	@Column(nullable = false)
+	@NotBlank(message = "Alias is required")
 	private String alias;
-	private Role role;
+	//private Role role;
 }

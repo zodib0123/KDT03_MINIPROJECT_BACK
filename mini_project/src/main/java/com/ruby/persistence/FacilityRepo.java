@@ -1,11 +1,14 @@
 package com.ruby.persistence;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.ruby.domain.Facility;
 
@@ -41,12 +44,36 @@ public interface FacilityRepo extends JpaRepository<Facility, Integer>{
 	List<Object[]> countByGugun(); 
 	*/
 	//given city, return counts within cities gugun/types
-	@Query("SELECT f.city, f.gugun, count(f) FROM Facility f GROUP BY f.city, f.gugun HAVING f.city=?1 ORDER BY f.city")
+	@Query("SELECT f.gugun, count(f) FROM Facility f GROUP BY f.city, f.gugun HAVING f.city=?1 ORDER BY f.city")
 	List<Object[]> countByGugun(String city); 
 	
-	@Query("SELECT f.city, f.type, count(f) FROM Facility f GROUP BY f.city, f.type HAVING f.city=?1 ORDER BY f.city")
+	@Query("SELECT f.type, count(f) FROM Facility f GROUP BY f.city, f.type HAVING f.city=?1 ORDER BY f.city")
 	List<Object[]> countByType(String city);
 
-	@Query("SELECT f.gugun, f.type, count(f) FROM Facility f GROUP BY f.city, f.gugun, f.type HAVING f.city=?1 AND f.gugun=?2 ORDER BY f.gugun")
+	@Query("SELECT f.type, count(f) FROM Facility f GROUP BY f.city, f.gugun, f.type HAVING f.city=?1 AND f.gugun=?2 ORDER BY f.gugun")
 	List<Object[]> countByTypeinGugun(String city, String gugun);
+	
+	//노후도 count
+	/*
+	String tenYearsAgo = LocalDate.now().minusYears(10).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+	String twentyFiveYearsAgo = LocalDate.now().minusYears(25).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+	
+	@Query("SELECT count(f) FROM facility f WHERE f.create_date >= :tenYearsAgo AND f.city = ?1")
+	List<Object[]> countNewInCity(String city, @Param("tenYearsAgo") String tenYearsAgo);
+	@Query("SELECT count(f) FROM facility f WHERE f.create_date <= :tenYearsAgo AND f.create_date >= :twntyFiveYearsAgo AND f.city = ?1")
+	List<Object[]> countMidInCity(String city, @Param("tenYearsAgo") String tenYearsAgo, @Param("twentyFiveYearsAgo") String twentyFiveYearsAgo);	
+	@Query("SELECT count(f) FROM facility f WHERE f.create_date <= :twentyFiveYearsAgo AND f.city = ?1")
+	List<Object[]> countOldInCity(String city, @Param("twentyFiveYearsAgo") String twentyFiveYearsAgo);
+	*/
+	
+	@Query(value = "SELECT count(*) FROM facility WHERE create_date >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 10 YEAR), '%Y%m%d') AND city=?1", 
+		       nativeQuery = true)
+	Integer countNewInCity(String city);
+	@Query(value = "SELECT count(*) FROM facility WHERE create_date > DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 25 YEAR), '%Y%m%d') AND create_date < DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 10 YEAR), '%Y%m%d') AND city=?1", 
+			nativeQuery = true)
+	Integer countMidInCity(String city);
+	@Query(value = "SELECT count(*) FROM facility WHERE create_date <= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 25 YEAR), '%Y%m%d') AND city=?1", 
+			nativeQuery = true)
+	Integer countOldInCity(String city);
+	
 }

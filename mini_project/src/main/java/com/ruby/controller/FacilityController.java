@@ -25,4 +25,9 @@ public class FacilityController {
 	public ResponseEntity<?> getCount(String city, String gugun, String type){
 		return ResponseEntity.ok(fserv.countFacility(city, gugun, type));
 	}
+	
+	@GetMapping("/count/old")
+	public ResponseEntity<?> getCount(String city){
+		return ResponseEntity.ok(fserv.countOld(city));
+	}
 }

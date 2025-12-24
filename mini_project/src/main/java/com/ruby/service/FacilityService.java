@@ -100,4 +100,18 @@ public class FacilityService {
 		}
 		return ret;
 	}
+	
+	//====================노후도 count
+	//====================노후도 count
+	//====================노후도 count
+	public Map<String, Object> countOld(String city){
+		Map<String, Object> ret = new HashMap<>();
+		
+		ret.put("city", city);
+		ret.put("old", frepo.countOldInCity(city));
+		ret.put("mid", frepo.countMidInCity(city));
+		ret.put("new", frepo.countNewInCity(city));
+		
+		return ret;
+	}
 }
