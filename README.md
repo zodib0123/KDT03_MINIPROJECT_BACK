@@ -23,3 +23,16 @@ Member관련 클래스 구현
 ㄴ가입시 아디/비번/별명 패턴추가
 ㄴ 회원가입시 발생하는 Exception추가
 (GlobalExceptionHandler로 처리)
+
+20251230
+인증API 작성 
+ㄴ가입시 아디/별명 충돌 예외 추가
+ㄴJWT를 이용한 로그인 인증 추가
+시설API 수정
+ㄴ광역시/도 내 내진카운트 추가
+
+20251231
+인가API 작성
+ㄴJWT를 이용한 리뷰조회 및 작성 인가 추가
+ㄴCORS 허용 origin 추가
+ㄴ/count/erdsgn api 일부수정
