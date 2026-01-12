@@ -1,2 +1,3 @@
 /.metadata/
-/OAuth2Props.txt
+/application-secrets.properties
+.properties

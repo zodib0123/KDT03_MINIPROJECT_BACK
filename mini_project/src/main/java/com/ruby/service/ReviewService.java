@@ -1,19 +1,16 @@
 package com.ruby.service;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ruby.domain.Facility;
 import com.ruby.domain.Review;
 import com.ruby.domain.dto.request.ReviewRequestDTO;
 import com.ruby.domain.dto.response.ReviewResponseDTO;
+import com.ruby.exception.ResourceNotFoundException;
+import com.ruby.exception.WriterMismatchException;
 import com.ruby.persistence.FacilityRepo;
 import com.ruby.persistence.MemberRepo;
 import com.ruby.persistence.ReviewRepo;
@@ -28,15 +25,7 @@ public class ReviewService {
 	private final MemberRepo mrepo;
 	private final FacilityRepo frepo;
 	
-//	public Map<String, Object> getReview(Integer fid){
 	public List<ReviewResponseDTO> getReview(Integer fid){
-		/*
-		Map<String,Object> ret = new HashMap<>();
-		ret.put("facility_id", fid);
-		Pageable paging= PageRequest.of(0,100); 
-		ret.put("review", rrepo.findByFacility_Fid(fid, paging));
-		return ret;
-		*/
 		List<ReviewResponseDTO> ret = new LinkedList<>();
 		List<Review> list = rrepo.findByFacility_Fid(fid);
 		for(Review r : list) {
@@ -44,7 +33,8 @@ public class ReviewService {
 										  r.getCont(),
 										  r.getFacility().getFid(), 
 										  r.getMember().getMid(), 
-										  r.getStar()
+										  r.getStar(),
+										  r.getMember().getAlias()
 									);
 			
 			ret.add(dto);
@@ -52,7 +42,7 @@ public class ReviewService {
 		return ret;
 	}
 	
-	public void addReview(ReviewRequestDTO dto) {
+	public String addReview(ReviewRequestDTO dto) {
 		Facility f = frepo.findById(dto.fid).get();
 		
 		Review review = Review.builder()
@@ -62,26 +52,17 @@ public class ReviewService {
 							  .star(dto.star)
 							  .build();
 		rrepo.save(review);
-		
-		//update facility.star
-		/*
-		Double currentStar = f.getStar()*f.getReviewCount(); 
-		f.setReviewCount(f.getReviewCount()+1);
-		f.setStar( (currentStar + dto.star) / f.getReviewCount());
-		frepo.save(f);*/
+		return "OK";
 	}
 	
-	public void deleteReview(ReviewRequestDTO dto) {
+	public void deleteReview(Integer seq, String mid) {
 		//delete review
-		rrepo.deleteById(dto.seq);
-
-		//update facility.star
-		/*
-		Facility f = frepo.findById(dto.fid).get();
-		Double currentStar = f.getStar()*f.getReviewCount(); 
-		f.setReviewCount(f.getReviewCount()-1);
-		f.setStar( (currentStar - dto.star) / f.getReviewCount());
-		frepo.save(f);*/
+		Review target = rrepo.findById(seq)
+				.orElseThrow(()-> new ResourceNotFoundException("Review not found."));
 		
+		if(target.getMember().getMid().equals(mid))
+			rrepo.deleteById(seq);
+		else
+			throw new WriterMismatchException("리뷰를 작성한 사람만 삭제할 수 있습니다!");
 	}
 }

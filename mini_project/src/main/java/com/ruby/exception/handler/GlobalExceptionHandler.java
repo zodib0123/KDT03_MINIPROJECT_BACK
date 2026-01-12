@@ -1,4 +1,4 @@
-package com.ruby.exception.controller;
+package com.ruby.exception.handler;
 
 import java.util.HashMap;
 import java.util.List;

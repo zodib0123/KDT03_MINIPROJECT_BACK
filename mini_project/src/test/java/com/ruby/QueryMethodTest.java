@@ -1,5 +1,7 @@
 package com.ruby;
 
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,31 +24,42 @@ public class QueryMethodTest {
 	ReviewRepo rrepo;
 	@Autowired
 	MemberRepo mrepo;
-	
-	//@Test
+
+	// @Test
 	public void queryTest() {
 		Pageable paging = PageRequest.of(0, 5);
-		Page<Facility> list = frepo.findByNameContaining("배드민턴",paging);
-		for(Facility f:list)
-			System.out.println("--->"+f);
+		Page<Facility> list = frepo.findByNameContaining("배드민턴", paging);
+		for (Facility f : list)
+			System.out.println("--->" + f);
 	}
-	
-	//@Test
+
+	// @Test
 	public void inputReview() {
-		mrepo.save(Member.builder()
-				.mid("1234")
-				.pwd("1234")
-				.alias("노리")
-				.build());
-		
-		for(int i=1;i<=10;i++) {
-			rrepo.save(Review.builder()
-					.seq(i)
-					.cont(i+"번째리뷰")
-					.facility(frepo.findById(1).get())
-					.member(mrepo.findById("1234").get())
-					.star(i%5)
-					.build());
+		mrepo.save(Member.builder().mid("1234").pwd("1234").alias("노리").build());
+
+		for (int i = 1; i <= 10; i++) {
+			rrepo.save(Review.builder().seq(i).cont(i + "번째리뷰").facility(frepo.findById(1).get())
+					.member(mrepo.findById("1234").get()).star(i % 5).build());
 		}
 	}
+
+	//@Test
+	public void inputMoreReview() {
+		Member member = mrepo.findById("qwer").get();
+
+		for (int j = 103; j <= 16489; j++) {
+			try {
+				for (int i = 1; i <= 5; i++) {
+					rrepo.save(Review.builder()
+						.cont(i + "번째리뷰")
+						.facility(frepo.findById(j).get())
+						.member(member)
+						.star(i).build());
+				}
+			} catch(NoSuchElementException e) {
+				continue;
+			}
+		}
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.ruby.service;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.ruby.domain.Facility;
 import com.ruby.persistence.FacilityRepo;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class FacilityService {
 	// ==================Search
 	// ==================Search
 	public Map<String, Object> getFacility(String name, String city, String gugun, String type, String sort, Integer pageNo) {
-		Map<String, Object> ret = new HashMap<>();
+		Map<String, Object> ret = new LinkedHashMap<>();
 			
 		Pageable paging = sort.equals("star") 
 				? PageRequest.of(pageNo, 20, Direction.DESC, "star")
@@ -66,7 +68,7 @@ public class FacilityService {
 		}
 
 		else {
-			ret.put("facility", "시설명, 광역시/도, 시설종류 중 하나의 검색조건을 반드시 입력하세요.");
+			ret.put("facility", frepo.findByCityContaining("",paging));
 		}
 
 		// 카운터 받는 부분
@@ -74,12 +76,19 @@ public class FacilityService {
 		// ret.put("total_count", ret.get("facility").size);
 		return ret;
 	}
-
+	
+	// ==================count
+	// ==================count
+	// ==================count
+	public Facility getFacilityById(Integer fid) {
+		return frepo.findById(fid).get();
+	}
+	
 	// ==================count
 	// ==================count
 	// ==================count
 	public Map<String, Object> countFacility(String city, String gugun, String type) {
-		Map<String, Object> ret = new HashMap<>();
+		Map<String, Object> ret = new LinkedHashMap<>();
 
 		if (city != null) {
 			ret.put("city", city);
@@ -109,7 +118,7 @@ public class FacilityService {
 	//====================노후도 count
 	//====================노후도 count
 	public Map<String, Object> countOld(String city){
-		Map<String, Object> ret = new HashMap<>();
+		Map<String, Object> ret = new LinkedHashMap<>();
 		
 		ret.put("city", city);
 		ret.put("old", frepo.countOldInCity(city));
@@ -123,11 +132,54 @@ public class FacilityService {
 	//====================내진설계 count
 	//====================내진설계 count
 	public Map<String, Object> countERD(String city){
-		Map<String, Object> ret = new HashMap<>();
+		Map<String, Object> ret = new LinkedHashMap<>();
 		
 		ret.put("city", city);
 		ret.put("erdsgn", frepo.countERDInCity(city));
+		ret.put("avg_old", frepo.avgOldInCity(city));
+		ret.put("number_of_guguns", frepo.countGugunsInCity(city));
 		ret.put("city_count_total", frepo.countByCityLike(city));
+		return ret;
+	}
+	
+	public Map<String, Object> oneHotCount(){
+		Map<String, Object> ret = new LinkedHashMap<>();
+		ret.put("count_all", frepo.countAll());
+		
+		/*
+ㄴtype wise count(obj)
+ㄴerd count
+ㄴold count
+		 * */
+		
+		//province wise count
+		Map<Object, Object> cityCountList = new LinkedHashMap<>();
+		//city wise count(obj)
+		for(Object[] city : frepo.countByCity()) {
+			Map<Object, Object> gugunCountList = new LinkedHashMap<>();
+			gugunCountList.put("total", city[1]);
+			gugunCountList.put("erdsgn", frepo.countERDInCity(String.valueOf( city[0])));
+			gugunCountList.put("avg_old", frepo.avgOldInCity(String.valueOf( city[0])));
+			gugunCountList.put("number_of_guguns", frepo.countGugunsInCity(String.valueOf( city[0])));
+			gugunCountList.put("old", frepo.countOldInCity(String.valueOf( city[0])));
+			gugunCountList.put("mid", frepo.countMidInCity(String.valueOf( city[0])));
+			gugunCountList.put("new", frepo.countNewInCity(String.valueOf( city[0])));
+			for(Object[] gugun : frepo.countByGugun(String.valueOf(city[0]))) {
+				//type wise count
+				Map<Object, Object> typeCountList = new LinkedHashMap<>();
+				typeCountList.put("total", gugun[1]);
+				for(Object[] type : frepo.countByTypeinGugun(String.valueOf(city[0]), String.valueOf(gugun[0]))) {
+					typeCountList.put(type[0], type[1]);
+				}
+				gugunCountList.put(gugun[0], typeCountList);
+			}
+			cityCountList.put(city[0],gugunCountList);
+		}
+		
+		ret.put("result", cityCountList);
+		
+		
+		
 		return ret;
 	}
 }

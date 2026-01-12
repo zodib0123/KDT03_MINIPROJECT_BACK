@@ -1,14 +1,11 @@
 package com.ruby.persistence;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.ruby.domain.Facility;
 
@@ -35,7 +32,7 @@ public interface FacilityRepo extends JpaRepository<Facility, Integer>{
 	
 	//return facility counts without input
 	@Query("SELECT COUNT(f) FROM Facility f")
-	List<Object[]> countAll(); 
+	Integer countAll(); 
 	
 	@Query("SELECT f.city, COUNT(f) FROM Facility f GROUP BY f.city ORDER BY f.city")
 	List<Object[]> countByCity(); 
@@ -78,5 +75,13 @@ public interface FacilityRepo extends JpaRepository<Facility, Integer>{
 	@Query(value = "SELECT count(*) FROM facility WHERE erdsgn='Y' AND city=?1", 
 			nativeQuery = true)
 	Integer countERDInCity(String city);
+	
+	//misc query
+	@Query(value = "SELECT count(*) FROM (SELECT DISTINCT gugun FROM facility WHERE city=?1) as count_guguns", 
+			nativeQuery = true)
+	Integer countGugunsInCity(String city);
+	@Query(value = "select round(avg((curdate()-create_date))/10000, 1) from facility where city like ?1", 
+			nativeQuery = true)
+	Double avgOldInCity(String city);
 	
 }

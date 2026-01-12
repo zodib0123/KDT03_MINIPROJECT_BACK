@@ -2,6 +2,7 @@ package com.ruby.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,11 @@ public class FacilityController {
 		return ResponseEntity.ok(fserv.getFacility(name, city, gugun, type, sort, pageNo));
 	}
 	
+	@GetMapping("/facility/detail")
+	public ResponseEntity<?> getFacility(Integer fid){
+		return ResponseEntity.ok(fserv.getFacilityById(fid));
+	}
+	
 	//count 메서드
 	@GetMapping("/count")
 	public ResponseEntity<?> getCount(String city, String gugun, String type){
@@ -34,5 +40,10 @@ public class FacilityController {
 	@GetMapping("/count/erdsgn")
 	public ResponseEntity<?> getCountERD(String city){
 		return ResponseEntity.ok(fserv.countERD(city));
+	}
+	
+	@GetMapping("/onehotcount")
+	public ResponseEntity<?> onehotcount(){
+		return ResponseEntity.ok(fserv.oneHotCount());
 	}
 }

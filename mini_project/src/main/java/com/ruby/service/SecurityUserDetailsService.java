@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ruby.domain.Member;
 import com.ruby.persistence.MemberRepo;
+import com.ruby.util.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,9 +20,6 @@ public class SecurityUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Member member = mrepo.findById(username).orElseThrow(()->new UsernameNotFoundException(username+" does not exist"));
-		return User.builder()
-				.username(member.getMid())
-				.password(member.getPwd())
-				.build();
+		return new CustomUser(member);
 	}
 }

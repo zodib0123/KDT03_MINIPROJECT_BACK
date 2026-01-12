@@ -48,12 +48,12 @@ public class Facility {
 
     @JsonProperty("star")
     public Double getStar() {
-        return (double) (Math.round(star*10)/10);
+        return (Math.round(star*10)/10.0);
     }
 	
 	@JsonProperty("fulladdr")
 	public String getFullAddr() {
-		return String.format("%s %s %s",
+		return String.format("%s %s",
 				this.addr1 != null ? this.addr1 : "",
 				this.addr2 != null ? this.addr2 : ""
 				);
