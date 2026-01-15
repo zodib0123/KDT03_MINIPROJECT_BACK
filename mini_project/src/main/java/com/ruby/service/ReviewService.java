@@ -55,14 +55,10 @@ public class ReviewService {
 		return "OK";
 	}
 	
-	public void deleteReview(Integer seq, String mid) {
+	public void deleteReview(Integer seq) {
 		//delete review
-		Review target = rrepo.findById(seq)
+		rrepo.findById(seq)
 				.orElseThrow(()-> new ResourceNotFoundException("Review not found."));
-		
-		if(target.getMember().getMid().equals(mid))
-			rrepo.deleteById(seq);
-		else
-			throw new WriterMismatchException("리뷰를 작성한 사람만 삭제할 수 있습니다!");
+		rrepo.deleteById(seq);
 	}
 }

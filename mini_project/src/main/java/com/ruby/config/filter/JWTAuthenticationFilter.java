@@ -2,6 +2,7 @@ package com.ruby.config.filter;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ruby.domain.Member;
+import com.ruby.exception.ResourceNotFoundException;
 import com.ruby.util.CustomUser;
 import com.ruby.util.JWTUtil;
 
@@ -23,10 +25,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
-	private final AuthenticationManager authManager;
-
+	private AuthenticationManager authManager;
+	
+	public JWTAuthenticationFilter(AuthenticationManager authManager) {
+        this.authManager=authManager;
+        setFilterProcessesUrl("/api/login"); 
+    }
+	
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
@@ -38,11 +44,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		try {
 			member = mapper.readValue(request.getInputStream(), Member.class);
 		} catch(IOException e) {
-			return null;
+			throw new ResourceNotFoundException("Login Failed");
 		}
 		
 		if(member == null)
-			return null;
+			throw new ResourceNotFoundException("Login Failed");
 		
 		Authentication token = new UsernamePasswordAuthenticationToken(member.getMid(), member.getPwd());
 		
@@ -53,21 +59,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		
-	    //response.addHeader("alias", URLEncoder.encode(alias, StandardCharsets.UTF_8));
-		
 		CustomUser user = (CustomUser)authResult.getPrincipal();
-		String token = JWTUtil.getJWT(user.getUsername());
+		String rawtoken = JWTUtil.getJWT(user.getUsername());
+		/*
 		if(token.startsWith("Bearer"))
 			token = token.split(" ")[1];
-		
+		*/
 		String alias = user.getAlias();
+		String mid = user.getUsername();
 		/*
-		HashMap<String, String> map = new HashMap<>();
-		//map.put("tok", token);
-		map.put("alias", alias);
-		map.put("mid", user.getUsername());
-		new ObjectMapper().writeValue(response.getOutputStream(), map);
-		 */
 		ResponseCookie jwtCookie = ResponseCookie.from("jwt_token", token)
 								.httpOnly(true)
 								.secure(false) //set to true in production?
@@ -76,7 +76,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 								.sameSite("Lax")
 								.build();
 		
-		ResponseCookie midCookie = ResponseCookie.from("mid", user.getUsername())
+		ResponseCookie midCookie = ResponseCookie.from("mid", mid)
 				.httpOnly(false)
 				.path("/")
 				.maxAge(12*3600)
@@ -88,14 +88,26 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				.maxAge(12*3600)
 				.build();
 		
-		response.addHeader(HttpHeaders.AUTHORIZATION, token);
 		response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, midCookie.toString());
 		response.addHeader(HttpHeaders.SET_COOKIE, aliasCookie.toString());
+		*/
+		
+		//response config
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		
 		response.setStatus(HttpStatus.OK.value());
+		
+		response.addHeader(HttpHeaders.AUTHORIZATION, rawtoken);
+		
+		Map<String, String> responseData = new HashMap<>();
+		responseData.put("jwt", rawtoken);
+		responseData.put("mid", mid);
+	    responseData.put("alias", alias);
+
+	    // 3. Write to the body using ObjectMapper
+	    ObjectMapper mapper = new ObjectMapper();
+	    mapper.writeValue(response.getWriter(), responseData);
 		
 	}
 	

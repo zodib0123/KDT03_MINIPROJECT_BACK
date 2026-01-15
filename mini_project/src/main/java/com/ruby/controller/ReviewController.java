@@ -31,9 +31,8 @@ public class ReviewController {
 	}
 	
 	@DeleteMapping("/review/{seq}")
-	public ResponseEntity<?> deleteReview(@PathVariable Integer seq, Authentication auth) {
-		String mid = auth.getName();
-		rserv.deleteReview(seq, mid);
+	public ResponseEntity<?> deleteReview(@PathVariable Integer seq) {
+		rserv.deleteReview(seq);
 		return ResponseEntity.ok().build();
 	}
 }

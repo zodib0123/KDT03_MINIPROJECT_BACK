@@ -32,10 +32,13 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		// get jwt from header
 		String jwt = request.getHeader(HttpHeaders.AUTHORIZATION);
+		
+		//will not use cookie
+		/*
 		//if not, get jwt from cookies
 		if(jwt == null)
 			jwt = getJwtFromCookies(request);
-		
+		*/
 		// if no valid jwt, pass filter
 		if (jwt == null || !jwt.startsWith(JWTUtil.prefix)) {
 			filterChain.doFilter(request, response);
@@ -61,6 +64,8 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 	
+	//Will not use cookie
+	/*
 	//=====================================================
 	//==========Read JWT from Cookie=======================
 	//=====================================================	
@@ -73,5 +78,5 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 			}
 		}
 		return null;
-	}
+	}*/
 }

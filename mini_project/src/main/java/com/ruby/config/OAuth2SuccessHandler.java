@@ -1,6 +1,8 @@
 package com.ruby.config;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
@@ -31,23 +33,30 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		Map<String, String> map = getUserInfo(authentication);
 		
 		String username = map.get("provider") + "_" + map.get("email");
+		String alias = username.split("@")[0];
 		if (!mrepo.existsById(username)) {
 			Member member = Member.builder()
 					.mid(username)
-					//.alias(username.substring(0, username.indexOf("@")))
-					.alias(username.split("@")[0])
+					.alias(alias)
 					.build();
 			mrepo.save(member);
 		}
-		String token = JWTUtil.getJWT(username);
+		String rawtoken = JWTUtil.getJWT(username);
 		
-		sendJWTtoClient(response, token);
+		sendJWTtoClient(response, rawtoken);
+		String token = rawtoken;
+		if(rawtoken.startsWith("Bearer"))
+			token = rawtoken.split(" ")[1];
 		
-		//url에 토큰을 넣어서 보냄
-		//String targetUrl = "http://10.125.121.xx:3000/~~~?token="+token;
-		//getRedirectStrategy().sendRedirect(request, response, targetUrl);
+		String encodedAlias = URLEncoder.encode(alias, StandardCharsets.UTF_8);
 		
-		//System.out.println("OAuth2SuccessHandler: login success!: " +token);
+		//use URL handoff
+		String target = "http://10.125.121.184.nip.io:3000/signin/callback"
+						+"?token="+token
+						+"&mid="+username
+						+"&alias="+encodedAlias;
+				
+		getRedirectStrategy().sendRedirect(request, response, target);
 	}
 	
 	//provider, email을 가져오는
