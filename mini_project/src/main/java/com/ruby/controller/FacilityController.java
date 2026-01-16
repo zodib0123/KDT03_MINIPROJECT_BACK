@@ -42,7 +42,7 @@ public class FacilityController {
 		return ResponseEntity.ok(fserv.countERD(city));
 	}
 	
-	@GetMapping("/onehotcount")
+	//@GetMapping("/onehotcount")
 	public ResponseEntity<?> onehotcount(){
 		return ResponseEntity.ok(fserv.oneHotCount());
 	}

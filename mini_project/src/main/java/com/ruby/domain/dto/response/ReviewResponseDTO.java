@@ -7,10 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReviewResponseDTO extends ReviewDTO{
+	Integer seq;
 	String alias;
 	public ReviewResponseDTO(Integer seq, String cont, Integer fid, String mid, Integer star, String alias) {
-		super(seq, cont, fid, mid, star);
+		super(cont, fid, mid, star);
 		this.alias = alias;
+		this.seq = seq;
 	}
 	
 }

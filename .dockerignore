@@ -1,0 +1,5 @@
+# .dockerignore example
+target/
+build/
+.git/
+*.iml

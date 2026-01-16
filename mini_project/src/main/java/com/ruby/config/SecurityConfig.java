@@ -20,6 +20,7 @@ import com.ruby.config.filter.JWTAuthenticationFilter;
 import com.ruby.config.filter.JWTAuthorizationFilter;
 import com.ruby.persistence.MemberRepo;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Configuration
@@ -42,11 +43,14 @@ public class SecurityConfig {
 			.httpBasic(bs->bs.disable())
 			.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth->auth
-					//.requestMatchers("/review/**").authenticated()
+					.requestMatchers("/review/**").authenticated()
 					.anyRequest().permitAll()
 					);
 		
-		http.formLogin(frm->frm.disable())
+		http.exceptionHandling(ex->ex.authenticationEntryPoint((request, response, authException)->{
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+		}))
+			.formLogin(frm->frm.disable())
 			.oauth2Login(oauth->oauth
 							.permitAll()
 							.successHandler(successhandler)
