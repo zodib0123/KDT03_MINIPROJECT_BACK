@@ -17,9 +17,18 @@ COPY src src
 # Use 'sh' to run the file so we don't need executable permissions
 RUN sh mvnw install -DskipTests
 
-# Stage 2: Runtime (remains the same)
+# Stage 2: Runtime
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /workspace/app/target/*[0-9].jar app.jar
+
+# Copy the JAR from the build stage to the current WORKDIR (/app)
+# We use a simpler pattern to ensure we grab the primary fat jar
+COPY --from=build /workspace/app/target/*.jar app.jar
+
+# Verify the file is there (This will show up in your Render logs)
+RUN ls -l /app/app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+# Run using the relative path to the WORKDIR
+ENTRYPOINT ["java", "-jar", "app.jar"]
