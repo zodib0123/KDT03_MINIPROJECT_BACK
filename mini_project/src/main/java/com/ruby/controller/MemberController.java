@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ruby.domain.Member;
 import com.ruby.domain.dto.request.MemberRequestDTO;
 import com.ruby.service.MemberService;
 
@@ -24,8 +23,8 @@ public class MemberController {
 	@PostMapping("/auth/signup")
 	@Operation(summary = "회원가입")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "가입 성공"),
-		@ApiResponse(responseCode = "400", description = "가입 실패"),
+		@ApiResponse(responseCode = "200", description = "가입 성공", content = @Content),
+		@ApiResponse(responseCode = "400", description = "Bad Request (request body 확인)", content = @Content),
 	})
 	public ResponseEntity<?> signup(@Valid @RequestBody 
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(

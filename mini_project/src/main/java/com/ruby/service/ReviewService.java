@@ -10,7 +10,6 @@ import com.ruby.domain.Review;
 import com.ruby.domain.dto.request.ReviewRequestDTO;
 import com.ruby.domain.dto.response.ReviewResponseDTO;
 import com.ruby.exception.ResourceNotFoundException;
-import com.ruby.exception.WriterMismatchException;
 import com.ruby.persistence.FacilityRepo;
 import com.ruby.persistence.MemberRepo;
 import com.ruby.persistence.ReviewRepo;
