@@ -1,38 +1,59 @@
-20251222
-리뷰 관련 api 구현
-ㄴ리뷰조회 
-ㄴ리뷰등록 
+# 🚀 K-Sport Hub
+> 전국공공체육시설 통합 데이터 플랫폼
 
-20251223
-데이터처리
-ㄴ내진설계, 완공날짜, 별점 column추가 
-ㄴ리뷰 삭제 
-ㄴ리뷰 추가/삭제시 별점처리 메소드 추가 
+![ReadingPage](./public/index.png)
 
-20251224
-리뷰API 수정
-ㄴ리뷰 추가/삭제시 별점처리 메소드 삭제 
-ㄴ시설테이블에 별점 콜럼 삭제 
-ㄴ노후화 카운트 API 추가 
+## 🎬 데모 영상
+<div align="center">
+  
+https://github.com/zodib0123/kdt_mini_front/raw/refs/heads/main/test_video.mp4
 
-20251229
-시설API 수정
-ㄴ평점계산기구현
-ㄴ평점순,최신순 sort
-Member관련 클래스 구현
-ㄴ가입시 아디/비번/별명 패턴추가
-ㄴ 회원가입시 발생하는 Exception추가
-(GlobalExceptionHandler로 처리)
+▲ 서비스 실행 테스트 영상 (test_video.mp4)
+</div>
 
-20251230
-인증API 작성 
-ㄴ가입시 아디/별명 충돌 예외 추가
-ㄴJWT를 이용한 로그인 인증 추가
-시설API 수정
-ㄴ광역시/도 내 내진카운트 추가
+## 🛠 기술 스택 (Tech Stack)
 
-20251231
-인가API 작성
-ㄴJWT를 이용한 리뷰조회 및 작성 인가 추가
-ㄴCORS 허용 origin 추가
-ㄴ/count/erdsgn api 일부수정
+### 💻 Backend
+| Category | Stack |
+| :--- | :--- |
+| **Language** | ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=openjdk&logoColor=white) |
+| **Framework** | ![SpringBoot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=springboot&logoColor=white) |
+| **Database** | ![MySQLDB](https://img.shields.io/badge/MySQLDB-003545?style=flat-square&logo=mysql&logoColor=white) |
+| **Build Tool** | ![Maven](https://img.shields.io/badge/Maven-EE303A?style=flat-square&logo=apachemaven&logoColor=white) |
+
+### 🎨 Frontend
+| Category | Stack |
+| :--- | :--- |
+| **Library** | ![NextJS](https://img.shields.io/badge/NextJS-FDFDFD?style=flat-square&logo=nextdotjs&logoColor=black) |
+| **Styling** | ![Tailwind](https://img.shields.io/badge/tailwind-1572B6?style=flat-square&logo=tailwindcss&logoColor=white) |
+
+## 🏗️ 시스템 아키텍처
+```mermaid
+graph LR
+    subgraph "External"
+        API[공공데이터포털 API]
+    end
+    subgraph "Backend (Spring Boot)"
+        Collector[Data Collector] --> DB[(MySQL)]
+        DB --> RestAPI[REST API Server]
+    end
+    subgraph "Frontend (Next.js)"
+        RestAPI --> UI[K-Sport Hub UI]
+        UI --> User((User))
+    end
+```
+
+
+## ⚡ 주요기능
+- **REST API**: 프론트엔드와 안전하고 효율적인 통신
+- **OPEN API**: SpringDocs를 이용한 REST API명세 자동화
+- **JWT/OAuth2**: Spring Security의 JWT를 이용한 인증인가, OAuth2 인증기능 구현 
+- **데이터 구조화**: 공공데이터 API 응답 형식을 DB에 정규화하여 저장함으로써 API 호출 비용 절감 및 조회 성능 최적화.
+
+
+## 📖 문서
+- [프로젝트 데모 바로가기 (vercel)](https://kdt-mini-front.vercel.app/)
+- [백엔드 배포 (Render)](https://kdt03-miniproject-back.onrender.com)
+- [DB 배포] 업데이트 예정
+- [프론트엔드 Github 주소](https://github.com/scatch1228/kdt_mini_front)
+- [전국체육시설 공공데이터](https://www.bigdata-culture.kr/bigdata/user/data_market/detail.do?id=3b5399ad-88c4-43aa-a1d7-7ef6a630370b)
